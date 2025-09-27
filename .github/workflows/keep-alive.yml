@@ -1,0 +1,28 @@
+name: Render Keep Alive
+
+# 设置定时任务：每 7 分钟运行一次
+# 7分钟的间隔远小于 Render 的 15 分钟休眠限制，确保服务保持活跃。
+on:
+  schedule:
+    - cron: '*/7 * * * *'
+  # 允许手动在 GitHub Actions 界面触发
+  workflow_dispatch:
+
+jobs:
+  ping_service:
+    runs-on: ubuntu-latest
+    
+    # 将您的服务 URL 设置为环境变量
+    env:
+      # ⚠️ 注意：请确保这是您的服务的正确 URL
+      SERVICE_URL: "https://rend-q7i0.onrender.com/"
+
+    steps:
+      - name: Ping Web Service
+        # 使用 curl 命令向您的服务 URL 发送一个简单的 GET 请求
+        run: |
+          echo "Pinging service at $(date)..."
+          # -sL 选项表示静默模式（不显示进度或错误）并跟随重定向
+          # 实际访问 URL 以重置非活跃计时器
+          curl -sL $SERVICE_URL
+          echo "Ping complete. Service remains awake."
